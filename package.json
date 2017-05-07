@@ -18,6 +18,7 @@
     "dotenv": "^4.0.0",
     "mysql": "^2.13.0",
     "node-fetch": "^1.6.3",
-    "node-horseman": "^3.3.0"
+    "node-horseman": "^3.3.0",
+    "phantomjs": "^2.1.7"
   }
 }
