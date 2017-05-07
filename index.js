@@ -21,8 +21,16 @@ dotenv.config({ silent: true });
 
     const twitterFollowers = async (user) => {
         const followers = await new Horseman().open(`http://twitter.com/${user}`)
-			.text('.ProfileNav-item--followers .ProfileNav-value')
-			.close();
+            .text('.ProfileNav-item--followers .ProfileNav-value')
+            .close();
+
+        return followers;
+    };
+
+    const instagramFollowers = async (user) => {
+        const followers = await new Horseman().open(`https://www.instagram.com/${user}/`)
+            .text('li:nth-child(2) span._bkw5z')
+            .close();
 
         return followers;
     };
@@ -33,6 +41,7 @@ dotenv.config({ silent: true });
     connection.query('INSERT INTO followers SET ?', { count: await facebookFollowers(process.env.FACEBOOK_USER, process.env.TOKEN_FACEBOOK), social_network: 'facebook' });
     connection.query('INSERT INTO followers SET ?', { count: await pinterestFollowers(process.env.PINTEREST_USER), social_network: 'pinterest' });
     connection.query('INSERT INTO followers SET ?', { count: await twitterFollowers(process.env.TWITTER_USER), social_network: 'twitter' });
+    connection.query('INSERT INTO followers SET ?', { count: await instagramFollowers(process.env.INSTAGRAM_USER), social_network: 'instagram' });
 
     connection.end();
 })();

@@ -12,4 +12,4 @@ build: ## Build with babel
 	@ chmod +x build/index.js
 
 lint: ## Lint
-	./node_modules/.bin/eslint .
+	./node_modules/.bin/eslint index.js
