@@ -8,7 +8,7 @@ run: ## Run
 	./node_modules/.bin/babel-node index.js
 
 build: ## Build with babel
-	@ ./node_modules/.bin/babel --compact true index.js --out-dir build/
+	@ ./node_modules/.bin/babel --compact true index.js counter.js --out-dir build/
 	@ chmod +x build/index.js
 
 lint: ## Lint

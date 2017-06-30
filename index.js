@@ -1,47 +1,54 @@
 import 'babel-polyfill';
-import mysql from 'mysql';
-import fetch from 'node-fetch';
+import mysql from 'promise-mysql';
 import dotenv from 'dotenv';
-import Horseman from 'node-horseman';
+import counter from './counter';
 
 dotenv.config({ silent: true });
 
 (async () => {
-    const pinterestFollowers = async (user) => {
-        const res = await fetch(`https://api.pinterest.com/v3/pidgets/users/${user}/pins/`);
-        const json = await res.json();
-        return json.data.user.follower_count;
-    };
+    const connection = await mysql.createConnection(process.env.MYSQL_CONNECTION);
 
-    const facebookFollowers = async (user, token) => {
-        const res = await fetch(`https://graph.facebook.com/${user}?access_token=${token}&fields=likes`);
-        const json = await res.json();
-        return json.likes;
-    };
+    // Alittlemarket
+    const alittleMarketSales = await counter('alittlemarket', process.env.ALITTLEMARKET_USER);
+    const lastAlittleMarketSales = await connection.query('SELECT * FROM stats WHERE website = ? ORDER BY date DESC LIMIT 1', ['alittlemarket']);
+    if (!lastAlittleMarketSales.length || alittleMarketSales !== lastAlittleMarketSales[0].count) {
+        await connection.query('INSERT INTO stats SET ?', { count: alittleMarketSales, website: 'alittlemarket' });
+    }
 
-    const twitterFollowers = async (user) => {
-        const followers = await new Horseman().open(`http://twitter.com/${user}`)
-            .text('.ProfileNav-item--followers .ProfileNav-value')
-            .close();
+    // Etsy
+    const etsySales = await counter('etsy', process.env.ETSY_USER);
+    const lastEtsySales = await connection.query('SELECT * FROM stats WHERE website = ? ORDER BY date DESC LIMIT 1', ['etsy']);
+    if (!lastEtsySales.length || etsySales !== lastEtsySales[0].count) {
+        await connection.query('INSERT INTO stats SET ?', { count: etsySales, website: 'etsy' });
+    }
 
-        return followers;
-    };
+    // Facebook
+    const facebookFollowers = await counter('facebook', process.env.FACEBOOK_USER);
+    const lastFacebookFollowers = await connection.query('SELECT * FROM stats WHERE website = ? ORDER BY date DESC LIMIT 1', ['facebook']);
+    if (!lastFacebookFollowers.length || facebookFollowers !== lastFacebookFollowers[0].count) {
+        await connection.query('INSERT INTO stats SET ?', { count: facebookFollowers, website: 'facebook' });
+    }
 
-    const instagramFollowers = async (user) => {
-        const followers = await new Horseman().open(`https://www.instagram.com/${user}/`)
-            .text('li:nth-child(2) span._bkw5z')
-            .close();
+    // Pinterest
+    const pinterestFollowers = await counter('pinterest', process.env.PINTEREST_USER);
+    const lastPinterestFollowers = await connection.query('SELECT * FROM stats WHERE website = ? ORDER BY date DESC LIMIT 1', ['pinterest']);
+    if (!lastPinterestFollowers.length || pinterestFollowers !== lastPinterestFollowers[0].count) {
+        await connection.query('INSERT INTO stats SET ?', { count: pinterestFollowers, website: 'pinterest' });
+    }
 
-        return followers;
-    };
+    // Twitter
+    const twitterFollowers = await counter('twitter', process.env.TWITTER_USER);
+    const lastTwitterFollowers = await connection.query('SELECT * FROM stats WHERE website = ? ORDER BY date DESC LIMIT 1', ['twitter']);
+    if (!lastTwitterFollowers.length || twitterFollowers !== lastTwitterFollowers[0].count) {
+        await connection.query('INSERT INTO stats SET ?', { count: twitterFollowers, website: 'twitter' });
+    }
 
-    const connection = mysql.createConnection(process.env.MYSQL_CONNECTION);
-    connection.connect();
+    // Instagram
+    const instagramFollowers = await counter('instagram', process.env.INSTAGRAM_USER);
+    const lastInstagramFollowers = await connection.query('SELECT * FROM stats WHERE website = ? ORDER BY date DESC LIMIT 1', ['instagram']);
+    if (!lastInstagramFollowers.length || instagramFollowers !== lastInstagramFollowers[0].count) {
+        await connection.query('INSERT INTO stats SET ?', { count: instagramFollowers, website: 'instagram' });
+    }
 
-    connection.query('INSERT INTO followers SET ?', { count: await facebookFollowers(process.env.FACEBOOK_USER, process.env.TOKEN_FACEBOOK), social_network: 'facebook' });
-    connection.query('INSERT INTO followers SET ?', { count: await pinterestFollowers(process.env.PINTEREST_USER), social_network: 'pinterest' });
-    connection.query('INSERT INTO followers SET ?', { count: await twitterFollowers(process.env.TWITTER_USER), social_network: 'twitter' });
-    connection.query('INSERT INTO followers SET ?', { count: await instagramFollowers(process.env.INSTAGRAM_USER), social_network: 'instagram' });
-
-    connection.end();
+    process.exit(0);
 })();
