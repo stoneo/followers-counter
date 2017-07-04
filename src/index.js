@@ -11,6 +11,7 @@ dotenv.config({ silent: true });
 
     const user = await githubUser(process.env.GITHUB_USER, process.env.GITHUB_TOKEN);
     await insertNewStat(connection, 'github', `${process.env.GITHUB_USER}_stars`, user.stars);
+    await insertNewStat(connection, 'github', `${process.env.GITHUB_USER}_followers`, user.followers);
 
     await connection.end();
 })();
