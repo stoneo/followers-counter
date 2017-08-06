@@ -5,14 +5,14 @@ export const pinterest = async (user) => {
     const res = await fetch(`https://api.pinterest.com/v3/pidgets/users/${user}/pins/`);
     const json = await res.json();
 
-    return { pinterest: Number(json.data.user.follower_count) };
+    return { followers: Number(json.data.user.follower_count) };
 };
 
 export const facebook = async (user, token) => {
     const res = await fetch(`https://graph.facebook.com/${user}?access_token=${token}&fields=likes`);
     const json = await res.json();
 
-    return { facebook: Number(json.likes) };
+    return { likes: Number(json.likes) };
 };
 
 export const twitter = async (user) => {
