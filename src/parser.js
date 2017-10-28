@@ -25,7 +25,7 @@ export const twitter = async (user) => {
 
 export const instagram = async (user) => {
     const followers = await new Horseman().open(`https://www.instagram.com/${user}/`)
-        .text('li:nth-child(2) span._bkw5z')
+        .text('li:nth-child(2) span._fd86t')
     .close();
 
     return { followers: Number(followers) };
