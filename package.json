@@ -21,6 +21,7 @@
     "node-fetch": "^1.6.3",
     "node-horseman": "^3.3.0",
     "phantomjs": "^2.1.7",
-    "promise-mysql": "^3.0.1"
+    "promise-mysql": "^3.0.1",
+    "puppeteer": "0.12.0"
   }
 }
